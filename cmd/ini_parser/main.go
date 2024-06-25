@@ -5,7 +5,6 @@ import (
 )
 
 func main() {
-	rowanGamal := "rowan"
 	fmt.Println("hello")
-	fmt.Println(rowanGamal)
+	loadFromFile("cmd/ini_parser/file.ini")
 }
