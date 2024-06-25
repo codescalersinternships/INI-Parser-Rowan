@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	rowan_gamal := "rue"
+	rowanGamal := "rowan"
 	fmt.Println("hello")
-	fmt.Println(rowan_gamal)
+	fmt.Println(rowanGamal)
 }
