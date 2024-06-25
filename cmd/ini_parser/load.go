@@ -3,12 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"os"
 	"io"
+	"os"
+	"strings"
 )
-var ini [] string
 
-func loadFromFile(fileName string){
+var ini []string
+
+func loadFromFile(fileName string) {
 	var input io.Reader
 	fmt.Println("hi")
 
@@ -28,4 +30,11 @@ func loadFromFile(fileName string){
 		fmt.Println(line)
 	}
 
+}
+
+func loadFromString(str string) {
+	ini = strings.Split(str, "\n")
+	for _, line := range ini {
+		fmt.Println(line)
+	}
 }
