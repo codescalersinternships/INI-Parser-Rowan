@@ -6,7 +6,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -19,7 +20,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -27,4 +29,5 @@ jobs:
       - name: Format
         run: go fmt ./...
       - name: Golangci Linter
-        run: golangci-lint run ./...
+        uses: golangci/golangci-lint-action@v6
+        # run: golangci-lint run ./...
