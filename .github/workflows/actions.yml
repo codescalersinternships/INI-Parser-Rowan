@@ -1,0 +1,34 @@
+name: Go
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+      - name: Install dependencies
+        run: go get .
+      - name: Build
+        run: go build ./...
+      - name: Test with the Go CLI
+        run: go test ./...
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.x'
+      - name: Format
+        run: go fmt ./...
+      - name: Go Linter
+        run: golint ./...
+      - name: Golangci Linter
+        run: golangci-lint run ./...
