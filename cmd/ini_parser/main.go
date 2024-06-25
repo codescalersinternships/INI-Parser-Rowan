@@ -18,6 +18,6 @@ func main() {
 	// fmt.Print(trimmed)
 	// fmt.Println("hello")
 	parserLogic(loadFromFile("cmd/ini_parser/file.ini"))
-
+	parserLogic(loadFromString("[hello]\nrowan = just a girl\ntest = ini\n[works]\nluna = cat"))
 	// loadFromString("rowan \nsays \nhi \nnom")
 }

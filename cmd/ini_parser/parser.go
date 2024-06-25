@@ -41,8 +41,7 @@ func loadFromFile(fileName string) []string {
 }
 
 func loadFromString(str string) []string {
-	var iniLines []string
-	iniLines = strings.Split(str, "\n")
+	iniLines := strings.Split(str, "\n")
 	// for _, line := range iniLines {
 	// 	fmt.Println(line)
 	// }
