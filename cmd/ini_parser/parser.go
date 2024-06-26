@@ -128,9 +128,14 @@ func ToString() string {
 	return stringVersion
 }
 
-// func SaveToFile(fileName string) {
-// 	file, err := os.Open(fileName)
-// 	if err != nil {
+// SaveToFile saves the whole ini map to the given file path
+func SaveToFile(fileName string) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		fmt.Println("Cannot open file!")
+		os.Exit(1)
+	}
+	defer file.Close()
 
-// 	}
-// }
+	file.WriteString(ToString())
+}
