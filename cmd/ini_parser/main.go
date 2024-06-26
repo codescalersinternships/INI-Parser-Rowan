@@ -3,15 +3,15 @@ package main
 import "fmt"
 
 func main() {
-	parserLogic(loadFromFile("cmd/ini_parser/file.ini"))
-	fmt.Println(getSectionNames())
-	fmt.Println(getSections())
-	fmt.Println(get("rowan", "hi"))
-	fmt.Println(get("hello", "rowan"))
-	fmt.Println(get("hello", "mohamed"))
-	set("hello", "uni", "corn")
-	set("new", "uni", "corn")
+	LoadFromFile("cmd/ini_parser/file.ini")
+	fmt.Println(GetSectionNames())
+	fmt.Println(GetSections())
+	fmt.Println(Get("rowan", "hi"))
+	fmt.Println(Get("hello", "rowan"))
+	fmt.Println(Get("hello", "mohamed"))
+	Set("hello", "uni", "corn")
+	Set("new", "uni", "corn")
 	fmt.Println(parsedMap.dictionary)
-	fmt.Println(toString())
-	parserLogic(loadFromString("[hello]\nrowan = just a girl\ntest = ini\n[works]\nluna = cat"))
+	fmt.Println(ToString())
+	LoadFromString("[hello]\nrowan = just a girl\ntest = ini\n[works]\nluna = cat")
 }
