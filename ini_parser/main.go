@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	LoadFromFile("cmd/ini_parser/file.ini")
+	LoadFromFile("ini_parser/file.ini")
 	fmt.Println(GetSectionNames())
 	fmt.Println(GetSections())
 	fmt.Println(Get("rowan", "hi"))

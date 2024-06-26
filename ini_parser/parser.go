@@ -137,5 +137,9 @@ func SaveToFile(fileName string) {
 	}
 	defer file.Close()
 
-	file.WriteString(ToString())
+	_, error := file.WriteString(ToString())
+	if error != nil {
+		fmt.Println("Cannot write to file!")
+		os.Exit(1)
+	}
 }
