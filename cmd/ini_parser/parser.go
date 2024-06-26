@@ -16,10 +16,11 @@ type Parser struct {
 	sections   []string
 }
 
+var parsedMap Parser
+
 func loadFromFile(fileName string) []string {
 	var iniLines []string
 	var input io.Reader
-	fmt.Println("hi")
 
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -33,29 +34,22 @@ func loadFromFile(fileName string) []string {
 	for scanner.Scan() {
 		iniLines = append(iniLines, scanner.Text())
 	}
-	// for _, line := range iniLines {
-	// 	fmt.Println(line)
-	// }
 	return iniLines
 
 }
 
 func loadFromString(str string) []string {
 	iniLines := strings.Split(str, "\n")
-	// for _, line := range iniLines {
-	// 	fmt.Println(line)
-	// }
 	return iniLines
 }
 
 func parserLogic(iniLines []string) {
 	var sections []string
-	parsedMap := Parser{make(map[string]map[string]string), sections}
+	parsedMap = Parser{make(map[string]map[string]string), sections}
 
 	var section, key, value string
 
 	for _, line := range iniLines {
-		// fmt.Println(line)
 		if line[0] == '[' {
 			for j, ch := range line {
 				if ch == ']' {
@@ -84,7 +78,53 @@ func parserLogic(iniLines []string) {
 				}
 			}
 		}
-		fmt.Println(parsedMap.sections)
-		fmt.Println(parsedMap.dictionary)
+		// fmt.Println(parsedMap.sections)
+		// fmt.Println(parsedMap.dictionary)
 	}
+	fmt.Println("Sections are: ", parsedMap.sections)
+	fmt.Println("Dictionary is: ", parsedMap.dictionary)
+}
+
+// func printParsedMap(){
+// 	fmt.Println(parsedMap)
+// }
+
+func getSectionNames() []string {
+	return parsedMap.sections
+}
+
+func getSections() map[string]map[string]string {
+	return parsedMap.dictionary
+}
+
+func get(sectionName, key string) string {
+	return parsedMap.dictionary[sectionName][key]
+}
+
+func set(sectionName, key, value string) {
+	// found := false
+	if parsedMap.dictionary[sectionName] == nil {
+		// for _, section := range parsedMap.sections {
+		// 	if section == sectionName {
+		// 		found = true
+		// 		break
+		// 	}
+		// }
+		// if found {
+
+		// }
+		parsedMap.dictionary[sectionName] = make(map[string]string)
+	}
+	parsedMap.dictionary[sectionName][key] = value
+}
+func toString() string {
+	var stringVersion string
+	for _, section := range parsedMap.sections {
+		stringVersion += "[" + section + "]"
+		for key, value := range parsedMap.dictionary[section] {
+			stringVersion += "\n"
+			stringVersion += key + " = " + value
+		}
+	}
+	return stringVersion
 }
