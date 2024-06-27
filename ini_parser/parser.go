@@ -8,15 +8,15 @@ import (
 	"strings"
 )
 
-// Parser Structure: dictionary, sections
+// parser Structure: dictionary, sections
 // It's basically a map of a map, map of sections where each section maps to keys : values
 // map[section] --> returns a map where each key --> value
-type Parser struct {
+type parser struct {
 	dictionary map[string]map[string]string
 	sections   []string
 }
 
-var parsedMap Parser
+var parsedMap parser
 
 // LoadFromFile loads ini file
 // Saves all lines locally into an array of strings
@@ -49,7 +49,7 @@ func LoadFromString(str string) {
 
 func parserLogic(iniLines []string) {
 	var sections []string
-	parsedMap = Parser{make(map[string]map[string]string), sections}
+	parsedMap = parser{make(map[string]map[string]string), sections}
 
 	var section, key, value string
 

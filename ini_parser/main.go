@@ -11,7 +11,7 @@ func main() {
 	fmt.Println(Get("hello", "mohamed"))
 	Set("hello", "uni", "corn")
 	Set("new", "uni", "corn")
-	fmt.Println(parsedMap.dictionary)
+	// fmt.Println(parsedMap.dictionary)
 	fmt.Println(ToString())
 	LoadFromString("[hello]\nrowan = just a girl\ntest = ini\n[works]\nluna = cat")
 }
