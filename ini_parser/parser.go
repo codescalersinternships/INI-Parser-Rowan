@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -17,16 +18,30 @@ type parser struct {
 
 var parsedMap parser
 
+// ErrCouldNotOpen happens when file cannot be opened
+var ErrCouldNotOpen = errors.New("cannot open file error")
+
+// ErrMissingValueAssignment happens when a key isn't followed by an = statement
+var ErrMissingValueAssignment = errors.New("key is not assigned to a value, no '=' found")
+
+// ErrSectionNameMissingClosure happens when section name is missing the ] paranthesis
+var ErrSectionNameMissingClosure = errors.New("section is missing closure paranthesis ]")
+
+// ErrWrongParanthesisOrder happens when section name starts by thw wrong paranthesis ']'
+var ErrWrongParanthesisOrder = errors.New("WrongParanthesisOrder section paranthesis order, section name cannot start by ]")
+
+// ErrInvalidSectionName happens when section is written in a wrong form --> ex: sectionName]
+var ErrInvalidSectionName = errors.New("section name can't start with anything other than [")
+
 // LoadFromFile loads ini file
 // Saves all lines locally into an array of strings
-func LoadFromFile(fileName string) {
+func LoadFromFile(fileName string) error {
 	var iniLines []string
 	var input io.Reader
 
 	file, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println("Cannot open file!")
-		os.Exit(1)
+		return ErrCouldNotOpen
 	}
 	defer file.Close()
 
@@ -35,18 +50,18 @@ func LoadFromFile(fileName string) {
 	for scanner.Scan() {
 		iniLines = append(iniLines, scanner.Text())
 	}
-	parserLogic(iniLines)
+	return parserLogic(iniLines)
 
 }
 
 // LoadFromString loads ini script from a string
 // Saves all lines locally into an array of strings
-func LoadFromString(str string) {
+func LoadFromString(str string) error {
 	iniLines := strings.Split(str, "\n")
-	parserLogic(iniLines)
+	return parserLogic(iniLines)
 }
 
-func parserLogic(iniLines []string) {
+func parserLogic(iniLines []string) error {
 	parsedMap = parser{make(map[string]map[string]string)}
 
 	var section, key, value string
@@ -55,20 +70,33 @@ func parserLogic(iniLines []string) {
 		if len(line) == 0 {
 			continue
 		} else if line[0] == '[' {
+			closingParaFound := false
 			for j, ch := range line {
 				if ch == ']' {
 					section = line[1:j]
+					section = strings.Trim(section, " ")
+					closingParaFound = true
 				}
+				// if closingParaFound && !(line[j] == ' ' || line[j] == '\n' || line[j] == '\t') {
+				// 	return ErrTextInSectionLine
+				// }
+			}
+			if !closingParaFound {
+				return ErrSectionNameMissingClosure
 			}
 			if parsedMap.dictionary == nil {
 				parsedMap.dictionary = make(map[string]map[string]string)
 			}
 
+		} else if line[0] == ']' {
+			return ErrWrongParanthesisOrder
 		} else if line[0] == ';' || line[0] == ' ' || line[0] == '\n' || line[0] == '\t' {
 			continue
 		} else {
+			equalFound := false
 			for j, ch := range line {
 				if ch == '=' {
+					equalFound = true
 					key = line[0:j]
 					value = line[j+1:]
 					key = strings.Trim(key, " ")
@@ -78,10 +106,16 @@ func parserLogic(iniLines []string) {
 					}
 					parsedMap.dictionary[section][key] = value
 					break
+				} else if ch == ']' {
+					return ErrInvalidSectionName
 				}
+			}
+			if !equalFound {
+				return ErrMissingValueAssignment
 			}
 		}
 	}
+	return nil
 }
 
 // GetSectionNames provides section names of parsed file/string
