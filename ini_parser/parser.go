@@ -13,7 +13,6 @@ import (
 // map[section] --> returns a map where each key --> value
 type parser struct {
 	dictionary map[string]map[string]string
-	sections   []string
 }
 
 var parsedMap parser
@@ -48,8 +47,7 @@ func LoadFromString(str string) {
 }
 
 func parserLogic(iniLines []string) {
-	var sections []string
-	parsedMap = parser{make(map[string]map[string]string), sections}
+	parsedMap = parser{make(map[string]map[string]string)}
 
 	var section, key, value string
 
@@ -60,7 +58,6 @@ func parserLogic(iniLines []string) {
 			for j, ch := range line {
 				if ch == ']' {
 					section = line[1:j]
-					parsedMap.sections = append(parsedMap.sections, section)
 				}
 			}
 			if parsedMap.dictionary == nil {
@@ -89,7 +86,11 @@ func parserLogic(iniLines []string) {
 
 // GetSectionNames provides section names of parsed file/string
 func GetSectionNames() []string {
-	return parsedMap.sections
+	var sectionNames []string
+	for section := range parsedMap.dictionary {
+		sectionNames = append(sectionNames, section)
+	}
+	return sectionNames
 }
 
 // GetSections provides the dictionary/map structure
@@ -117,7 +118,7 @@ func Set(sectionName, key, value string) {
 // Ignores redundant spaces
 func ToString() string {
 	var stringVersion string
-	for _, section := range parsedMap.sections {
+	for section := range parsedMap.dictionary {
 		stringVersion += "[" + section + "]"
 		for key, value := range parsedMap.dictionary[section] {
 			stringVersion += "\n"
@@ -130,16 +131,9 @@ func ToString() string {
 
 // SaveToFile saves the whole ini map to the given file path
 func SaveToFile(fileName string) {
-	file, err := os.Open(fileName)
+	err := os.WriteFile(fileName, []byte (ToString()),0644)
 	if err != nil {
-		fmt.Println("Cannot open file!")
-		os.Exit(1)
-	}
-	defer file.Close()
-
-	_, error := file.WriteString(ToString())
-	if error != nil {
-		fmt.Println("Cannot write to file!")
+		fmt.Println("Error while writing to file")
 		os.Exit(1)
 	}
 }
