@@ -75,8 +75,8 @@ func parserLogic(iniLines []string) {
 					value = strings.Trim(value, " ")
 					if parsedMap.dictionary[section] == nil {
 						parsedMap.dictionary[section] = make(map[string]string)
-						parsedMap.dictionary[section][key] = value
 					}
+					parsedMap.dictionary[section][key] = value
 					break
 				}
 			}
@@ -131,7 +131,7 @@ func ToString() string {
 
 // SaveToFile saves the whole ini map to the given file path
 func SaveToFile(fileName string) {
-	err := os.WriteFile(fileName, []byte (ToString()),0644)
+	err := os.WriteFile(fileName, []byte(ToString()), 0644)
 	if err != nil {
 		fmt.Println("Error while writing to file")
 		os.Exit(1)
