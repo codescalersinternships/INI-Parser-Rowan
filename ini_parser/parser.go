@@ -31,7 +31,7 @@ var ErrMissingValueAssignment error
 // ErrSectionNameMissingClosure happens when section name is missing the ] paranthesis
 var ErrSectionNameMissingClosure error
 
-// ErrWrongParanthesisOrder happens when section name starts by thw wrong paranthesis ']'
+// ErrWrongParanthesisOrder happens when section name starts by the wrong paranthesis ']'
 var ErrWrongParanthesisOrder error
 
 // ErrInvalidSectionName happens when section is written in a wrong form --> ex: sectionName]
@@ -66,8 +66,6 @@ func (parsedMap *Parser) LoadFromString(str string) error {
 }
 
 func (parsedMap *Parser) parserLogic(iniLines []string) error {
-	// parsedMap.dictionary = make(map[string]map[string]string)
-
 	var section, key, value string
 
 	for _, line := range iniLines {
@@ -80,6 +78,9 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 					section = line[1:j]
 					section = strings.Trim(section, " ")
 					closingParaFound = true
+					if parsedMap.dictionary[section] == nil {
+						parsedMap.dictionary[section] = make(map[string]string)
+					}
 				}
 			}
 			if !closingParaFound {
@@ -104,9 +105,6 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 					value = line[j+1:]
 					key = strings.Trim(key, " ")
 					value = strings.Trim(value, " ")
-					if parsedMap.dictionary[section] == nil {
-						parsedMap.dictionary[section] = make(map[string]string)
-					}
 					parsedMap.dictionary[section][key] = value
 					break
 				} else if ch == ']' {
