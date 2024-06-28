@@ -1,4 +1,4 @@
 parse
-ini_parser/main.go
-ini_parser/file.ini
-ini_parser/saved.ini
+main.go
+file.ini
+saved.ini

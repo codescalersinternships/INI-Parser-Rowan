@@ -20,8 +20,6 @@ func NewParser() Parser {
 	return Parser{make(map[string]map[string]string)}
 }
 
-// var parsedMap Parser
-
 // ErrCouldNotOpen happens when file cannot be opened and provides file name
 var ErrCouldNotOpen error
 
@@ -36,6 +34,9 @@ var ErrWrongParanthesisOrder error
 
 // ErrInvalidSectionName happens when section is written in a wrong form --> ex: sectionName]
 var ErrInvalidSectionName error
+
+// ErrCouldNotWriteToFile happens when file cannot be written to
+var ErrCouldNotWriteToFile error
 
 // LoadFromFile loads ini file
 // Saves all lines locally into an array of strings
@@ -167,10 +168,11 @@ func (parsedMap *Parser) ToString() string {
 }
 
 // SaveToFile saves the whole ini map to the given file path
-func (parsedMap *Parser) SaveToFile(fileName string) {
+func (parsedMap *Parser) SaveToFile(fileName string) error {
 	err := os.WriteFile(fileName, []byte(parsedMap.ToString()), 0644)
 	if err != nil {
-		fmt.Println("Error while writing to file")
-		os.Exit(1)
+		ErrCouldNotWriteToFile = fmt.Errorf("cannot write/save to file: %s", fileName)
+		return ErrCouldNotWriteToFile
 	}
+	return nil
 }
