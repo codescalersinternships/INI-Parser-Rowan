@@ -9,17 +9,22 @@ import (
 	"strings"
 )
 
-// parser Structure: dictionary, sections
+// Parser Structure: dictionary, sections
 // It's basically a map of a map, map of sections where each section maps to keys : values
 // map[section] --> returns a map where each key --> value
-type parser struct {
+type Parser struct {
 	dictionary map[string]map[string]string
 }
 
-var parsedMap parser
+// NewParser creates an instance of our Parser, which is iniitially an empty map of maps
+func NewParser() Parser {
+	return Parser{make(map[string]map[string]string)}
+}
+
+// var parsedMap Parser
 
 // ErrCouldNotOpen happens when file cannot be opened
-var ErrCouldNotOpen = errors.New("cannot open file error")
+var ErrCouldNotOpen = errors.New("cannot open file error") //add filename + change new to fmt.Errorf
 
 // ErrMissingValueAssignment happens when a key isn't followed by an = statement
 var ErrMissingValueAssignment = errors.New("key is not assigned to a value, no '=' found")
@@ -35,7 +40,7 @@ var ErrInvalidSectionName = errors.New("section name can't start with anything o
 
 // LoadFromFile loads ini file
 // Saves all lines locally into an array of strings
-func LoadFromFile(fileName string) error {
+func (parsedMap *Parser) LoadFromFile(fileName string) error {
 	var iniLines []string
 	var input io.Reader
 
@@ -50,19 +55,18 @@ func LoadFromFile(fileName string) error {
 	for scanner.Scan() {
 		iniLines = append(iniLines, scanner.Text())
 	}
-	return parserLogic(iniLines)
-
+	return parsedMap.parserLogic(iniLines)
 }
 
 // LoadFromString loads ini script from a string
 // Saves all lines locally into an array of strings
-func LoadFromString(str string) error {
+func (parsedMap *Parser) LoadFromString(str string) error {
 	iniLines := strings.Split(str, "\n")
-	return parserLogic(iniLines)
+	return parsedMap.parserLogic(iniLines)
 }
 
-func parserLogic(iniLines []string) error {
-	parsedMap = parser{make(map[string]map[string]string)}
+func (parsedMap *Parser) parserLogic(iniLines []string) error {
+	// parsedMap.dictionary = make(map[string]map[string]string)
 
 	var section, key, value string
 
@@ -119,7 +123,7 @@ func parserLogic(iniLines []string) error {
 }
 
 // GetSectionNames provides section names of parsed file/string
-func GetSectionNames() []string {
+func (parsedMap *Parser) GetSectionNames() []string {
 	var sectionNames []string
 	for section := range parsedMap.dictionary {
 		sectionNames = append(sectionNames, section)
@@ -128,20 +132,20 @@ func GetSectionNames() []string {
 }
 
 // GetSections provides the dictionary/map structure
-func GetSections() map[string]map[string]string {
+func (parsedMap *Parser) GetSections() map[string]map[string]string {
 	return parsedMap.dictionary
 }
 
 // Get function takes 2 parameters: section and its key
 // Provides equivalent value
 // If section or key aren't found, it returns the zero values
-func Get(sectionName, key string) string {
+func (parsedMap *Parser) Get(sectionName, key string) string {
 	return parsedMap.dictionary[sectionName][key]
 }
 
 // Set Function takes 3 parameters: section, key and value
 // If section isn't already present, it makes the map first
-func Set(sectionName, key, value string) {
+func (parsedMap *Parser) Set(sectionName, key, value string) {
 	if parsedMap.dictionary[sectionName] == nil {
 		parsedMap.dictionary[sectionName] = make(map[string]string)
 	}
@@ -150,7 +154,7 @@ func Set(sectionName, key, value string) {
 
 // ToString function returns a string structure of the ini file
 // Ignores redundant spaces
-func ToString() string {
+func (parsedMap *Parser) ToString() string {
 	var stringVersion string
 	for section := range parsedMap.dictionary {
 		stringVersion += "[" + section + "]"
@@ -164,8 +168,8 @@ func ToString() string {
 }
 
 // SaveToFile saves the whole ini map to the given file path
-func SaveToFile(fileName string) {
-	err := os.WriteFile(fileName, []byte(ToString()), 0644)
+func (parsedMap *Parser) SaveToFile(fileName string) {
+	err := os.WriteFile(fileName, []byte(parsedMap.ToString()), 0644)
 	if err != nil {
 		fmt.Println("Error while writing to file")
 		os.Exit(1)
