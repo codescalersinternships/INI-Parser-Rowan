@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -23,20 +22,20 @@ func NewParser() Parser {
 
 // var parsedMap Parser
 
-// ErrCouldNotOpen happens when file cannot be opened
-var ErrCouldNotOpen = errors.New("cannot open file error") //add filename + change new to fmt.Errorf
+// ErrCouldNotOpen happens when file cannot be opened and provides file name
+var ErrCouldNotOpen error
 
 // ErrMissingValueAssignment happens when a key isn't followed by an = statement
-var ErrMissingValueAssignment = errors.New("key is not assigned to a value, no '=' found")
+var ErrMissingValueAssignment error
 
 // ErrSectionNameMissingClosure happens when section name is missing the ] paranthesis
-var ErrSectionNameMissingClosure = errors.New("section is missing closure paranthesis ]")
+var ErrSectionNameMissingClosure error
 
 // ErrWrongParanthesisOrder happens when section name starts by thw wrong paranthesis ']'
-var ErrWrongParanthesisOrder = errors.New("WrongParanthesisOrder section paranthesis order, section name cannot start by ]")
+var ErrWrongParanthesisOrder error
 
 // ErrInvalidSectionName happens when section is written in a wrong form --> ex: sectionName]
-var ErrInvalidSectionName = errors.New("section name can't start with anything other than [")
+var ErrInvalidSectionName error
 
 // LoadFromFile loads ini file
 // Saves all lines locally into an array of strings
@@ -46,6 +45,7 @@ func (parsedMap *Parser) LoadFromFile(fileName string) error {
 
 	file, err := os.Open(fileName)
 	if err != nil {
+		ErrCouldNotOpen = fmt.Errorf("cannot open file: %s", fileName)
 		return ErrCouldNotOpen
 	}
 	defer file.Close()
@@ -81,11 +81,9 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 					section = strings.Trim(section, " ")
 					closingParaFound = true
 				}
-				// if closingParaFound && !(line[j] == ' ' || line[j] == '\n' || line[j] == '\t') {
-				// 	return ErrTextInSectionLine
-				// }
 			}
 			if !closingParaFound {
+				ErrSectionNameMissingClosure = fmt.Errorf("section [%s] is missing closure paranthesis ']'", line[1:])
 				return ErrSectionNameMissingClosure
 			}
 			if parsedMap.dictionary == nil {
@@ -93,6 +91,7 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 			}
 
 		} else if line[0] == ']' {
+			ErrWrongParanthesisOrder = fmt.Errorf("wrong section paranthesis order, the section provided, %s, cannot start by ]", line)
 			return ErrWrongParanthesisOrder
 		} else if line[0] == ';' || line[0] == ' ' || line[0] == '\n' || line[0] == '\t' {
 			continue
@@ -111,10 +110,12 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 					parsedMap.dictionary[section][key] = value
 					break
 				} else if ch == ']' {
+					ErrInvalidSectionName = fmt.Errorf("section name provided, %s, can't start with anything other than '['", line[:j+1])
 					return ErrInvalidSectionName
 				}
 			}
 			if !equalFound {
+				ErrMissingValueAssignment = fmt.Errorf("key provided, %s , is not assigned to a value, no '=' found", line)
 				return ErrMissingValueAssignment
 			}
 		}
