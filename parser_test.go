@@ -349,7 +349,7 @@ func Test_SaveToFile(t *testing.T) {
 		if err != nil {
 			t.Error()
 		}
-		e := parser.SaveToFile("evil" + fileName)
+		e := parser.SaveToFile("evil/" + fileName)
 		if e != ErrCouldNotWriteToFile {
 			t.Errorf("Got %v, wanted %v", e, ErrCouldNotWriteToFile)
 		}
