@@ -16,14 +16,14 @@ var invaildSectionStartString = "people]\nrowan = just a girl\nbob ross = bad me
 
 var fileName = "temp.ini"
 
-	func writeToFile(toWrite string) error {
-		err := os.WriteFile(fileName, []byte(toWrite), 0644)
-		if err != nil {
-			ErrCouldNotWriteToFile = fmt.Errorf("cannot write/save to file: %s", fileName)
-			return ErrCouldNotWriteToFile
-		}
-		return nil
+func writeToFile(toWrite string) error {
+	err := os.WriteFile(fileName, []byte(toWrite), 0644)
+	if err != nil {
+		ErrCouldNotWriteToFile = fmt.Errorf("cannot write/save to file: %s", fileName)
+		return ErrCouldNotWriteToFile
 	}
+	return nil
+}
 func Test_LoadFromFile(t *testing.T) {
 	parser := NewParser()
 	t.Run("Nil Error returned", func(t *testing.T) {
