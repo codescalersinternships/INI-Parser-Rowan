@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -156,14 +157,26 @@ func (parsedMap *Parser) Set(sectionName, key, value string) {
 // Ignores redundant spaces
 func (parsedMap *Parser) ToString() string {
 	var stringVersion string
+	var sortedSections []string
 	for section := range parsedMap.dictionary {
+		sortedSections = append(sortedSections, section)
+	}
+	sort.Strings(sortedSections)
+	for _, section := range sortedSections {
 		stringVersion += "[" + section + "]"
-		for key, value := range parsedMap.dictionary[section] {
+
+		var keys []string
+		for key := range parsedMap.dictionary[section] {
+			keys = append(keys, key)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
 			stringVersion += "\n"
-			stringVersion += key + " = " + value
+			stringVersion += key + " = " + parsedMap.dictionary[section][key]
 		}
 		stringVersion += "\n"
 	}
+	stringVersion = strings.Trim(stringVersion, "\n")
 	return stringVersion
 }
 

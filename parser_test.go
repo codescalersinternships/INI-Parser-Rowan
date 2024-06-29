@@ -5,14 +5,16 @@ import (
 	"os"
 	"reflect"
 	"slices"
+	"sort"
 	"testing"
 )
 
-var nilStringToTest = "[people]\nrowan = just a girl\nbob ross = bad mentor\n[entity]\ncodeScalers = company\n[location]\nalex = city"
+var normalStringToTest = "[people]\nrowan = just a girl\nbob ross = bad mentor\n[entity]\ncodeScalers = company\n[location]\nalex = city"
 var missingValueString = "[people]\nrowan = just a girl\nbob ross = bad mentor\n[entity]\ncodeScalers \n[location]\nalex = city"
 var missingClosureString = "[people\nrowan = just a girl\nbob ross = bad mentor\n[entity]\ncodeScalers = company\n[location]\nalex = city"
 var wrongParanthesisString = "]people[\nrowan = just a girl\nbob ross = bad mentor\n[entity]\ncodeScalers \n[location]\nalex = city"
 var invaildSectionStartString = "people]\nrowan = just a girl\nbob ross = bad mentor\n[entity]\ncodeScalers = company\n[location]\nalex = city"
+var emptyString = ""
 
 var fileName = "temp.ini"
 
@@ -27,7 +29,7 @@ func writeToFile(toWrite string) error {
 func Test_LoadFromFile(t *testing.T) {
 	parser := NewParser()
 	t.Run("Nil Error returned", func(t *testing.T) {
-		e := writeToFile(nilStringToTest)
+		e := writeToFile(normalStringToTest)
 		if e != nil {
 			t.Errorf("error is %v", e)
 		}
@@ -43,7 +45,7 @@ func Test_LoadFromFile(t *testing.T) {
 		}
 		err := parser.LoadFromFile(fileName)
 		if err != ErrMissingValueAssignment {
-			t.Errorf("Got %v, wanted %v", err, nil)
+			t.Errorf("Got %v, wanted %v", err, ErrMissingValueAssignment)
 		}
 	})
 	t.Run("Section name missing closure parenthesis", func(t *testing.T) {
@@ -53,7 +55,7 @@ func Test_LoadFromFile(t *testing.T) {
 		}
 		err := parser.LoadFromFile(fileName)
 		if err != ErrSectionNameMissingClosure {
-			t.Errorf("Got %v, wanted %v", err, nil)
+			t.Errorf("Got %v, wanted %v", err, ErrSectionNameMissingClosure)
 		}
 	})
 	t.Run("Wrong Paranthesis Order", func(t *testing.T) {
@@ -63,7 +65,7 @@ func Test_LoadFromFile(t *testing.T) {
 		}
 		err := parser.LoadFromFile(fileName)
 		if err != ErrWrongParanthesisOrder {
-			t.Errorf("Got %v, wanted %v", err, nil)
+			t.Errorf("Got %v, wanted %v", err, ErrWrongParanthesisOrder)
 		}
 	})
 	t.Run("Invalid Section starting", func(t *testing.T) {
@@ -73,6 +75,16 @@ func Test_LoadFromFile(t *testing.T) {
 		}
 		err := parser.LoadFromFile(fileName)
 		if err != ErrInvalidSectionName {
+			t.Errorf("Got %v, wanted %v", err, ErrInvalidSectionName)
+		}
+	})
+	t.Run("Empty String, should not cause any error", func(t *testing.T) {
+		e := writeToFile(emptyString)
+		if e != nil {
+			t.Error()
+		}
+		err := parser.LoadFromFile(fileName)
+		if err != nil {
 			t.Errorf("Got %v, wanted %v", err, nil)
 		}
 	})
@@ -80,7 +92,7 @@ func Test_LoadFromFile(t *testing.T) {
 func Test_LoadFromString(t *testing.T) {
 	parser := NewParser()
 	t.Run("Nil Error returned", func(t *testing.T) {
-		err := parser.LoadFromString(nilStringToTest)
+		err := parser.LoadFromString(normalStringToTest)
 		if err != nil {
 			t.Errorf("Got %v, wanted %v", err, nil)
 		}
@@ -88,24 +100,30 @@ func Test_LoadFromString(t *testing.T) {
 	t.Run("Missing value assignment", func(t *testing.T) {
 		err := parser.LoadFromString(missingValueString)
 		if err != ErrMissingValueAssignment {
-			t.Errorf("Got %v, wanted %v", err, nil)
+			t.Errorf("Got %v, wanted %v", err, ErrMissingValueAssignment)
 		}
 	})
 	t.Run("Section name missing closure parenthesis", func(t *testing.T) {
 		err := parser.LoadFromString(missingClosureString)
 		if err != ErrSectionNameMissingClosure {
-			t.Errorf("Got %v, wanted %v", err, nil)
+			t.Errorf("Got %v, wanted %v", err, ErrSectionNameMissingClosure)
 		}
 	})
 	t.Run("Wrong Paranthesis Order", func(t *testing.T) {
 		err := parser.LoadFromString(wrongParanthesisString)
 		if err != ErrWrongParanthesisOrder {
-			t.Errorf("Got %v, wanted %v", err, nil)
+			t.Errorf("Got %v, wanted %v", err, ErrWrongParanthesisOrder)
 		}
 	})
 	t.Run("Invalid Section starting", func(t *testing.T) {
 		err := parser.LoadFromString(invaildSectionStartString)
 		if err != ErrInvalidSectionName {
+			t.Errorf("Got %v, wanted %v", err, ErrInvalidSectionName)
+		}
+	})
+	t.Run("Empty String, should not cause any error", func(t *testing.T) {
+		err := parser.LoadFromString(emptyString)
+		if err != nil {
 			t.Errorf("Got %v, wanted %v", err, nil)
 		}
 	})
@@ -121,6 +139,8 @@ func Test_GetSectionNames(t *testing.T) {
 		}
 		got := parser.GetSectionNames()
 		expected := []string{"people", "entity", "location"}
+		sort.Strings(expected)
+		sort.Strings(got)
 		if !slices.Equal(got, expected) {
 			t.Errorf("Expected %v , Got %v", expected, got)
 		}
@@ -134,6 +154,8 @@ func Test_GetSectionNames(t *testing.T) {
 		}
 		got := parser.GetSectionNames()
 		expected := []string{"people"}
+		sort.Strings(expected)
+		sort.Strings(got)
 		if !slices.Equal(got, expected) {
 			t.Errorf("Expected %v , Got %v", expected, got)
 		}
@@ -147,6 +169,8 @@ func Test_GetSectionNames(t *testing.T) {
 		}
 		got := parser.GetSectionNames()
 		expected := []string{"people", "entity", "location"}
+		sort.Strings(expected)
+		sort.Strings(got)
 		if !slices.Equal(got, expected) {
 			t.Errorf("Expected %v , Got %v", expected, got)
 		}
@@ -272,7 +296,7 @@ func Test_Set(t *testing.T) {
 
 func Test_ToString(t *testing.T) {
 	parser := NewParser()
-	expected := "[people]\nrowan = just a girl\nbob ross = good mentor\n[entity]\ncodeScalers = company\n[location]\nalex = city\n"
+	expected := "[entity]\ncodeScalers = company\n[location]\nalex = city\n[people]\nbob ross = good mentor\nrowan = just a girl"
 
 	t.Run("ToString same as input", func(t *testing.T) {
 		stringToTest := "[people]\nrowan = just a girl\nbob ross = good mentor\n[entity]\ncodeScalers = company\n[location]\nalex = city"
@@ -294,6 +318,40 @@ func Test_ToString(t *testing.T) {
 		got := parser.ToString()
 		if got != expected {
 			t.Errorf("Expected\n%v , Got\n %v", expected, got)
+		}
+	})
+}
+
+func Test_SaveToFile(t *testing.T) {
+	parser := NewParser()
+	t.Run("Empty String, should not cause any error", func(t *testing.T) {
+		err := parser.LoadFromString(emptyString)
+		if err != nil {
+			t.Error()
+		}
+		e := parser.SaveToFile(fileName)
+		if e != nil {
+			t.Errorf("Got %v, wanted %v", e, nil)
+		}
+	})
+	t.Run("Normal String, should not cause any error", func(t *testing.T) {
+		err := parser.LoadFromString(normalStringToTest)
+		if err != nil {
+			t.Error()
+		}
+		e := parser.SaveToFile(fileName)
+		if e != nil {
+			t.Errorf("Got %v, wanted %v", e, nil)
+		}
+	})
+	t.Run("File Name problem", func(t *testing.T) {
+		err := parser.LoadFromString(normalStringToTest)
+		if err != nil {
+			t.Error()
+		}
+		e := parser.SaveToFile("evil" + fileName)
+		if e != ErrCouldNotWriteToFile {
+			t.Errorf("Got %v, wanted %v", e, ErrCouldNotWriteToFile)
 		}
 	})
 }
