@@ -1,8 +1,8 @@
 package main
 
 import (
-	// "fmt"
-	// "os"
+	"fmt"
+	"os"
 	"reflect"
 	"slices"
 	"testing"
@@ -14,68 +14,68 @@ var missingClosureString = "[people\nrowan = just a girl\nbob ross = bad mentor\
 var wrongParanthesisString = "]people[\nrowan = just a girl\nbob ross = bad mentor\n[entity]\ncodeScalers \n[location]\nalex = city"
 var invaildSectionStartString = "people]\nrowan = just a girl\nbob ross = bad mentor\n[entity]\ncodeScalers = company\n[location]\nalex = city"
 
-// var fileName = "ini_parser/temp.ini"
+var fileName = "temp.ini"
 
-//	func writeToFile(toWrite string) error {
-//		err := os.WriteFile(fileName, []byte(toWrite), 0644)
-//		if err != nil {
-//			ErrCouldNotWriteToFile = fmt.Errorf("cannot write/save to file: %s", fileName)
-//			return ErrCouldNotWriteToFile
-//		}
-//		return nil
-//	}
+	func writeToFile(toWrite string) error {
+		err := os.WriteFile(fileName, []byte(toWrite), 0644)
+		if err != nil {
+			ErrCouldNotWriteToFile = fmt.Errorf("cannot write/save to file: %s", fileName)
+			return ErrCouldNotWriteToFile
+		}
+		return nil
+	}
 func Test_LoadFromFile(t *testing.T) {
-	// parser := NewParser()
-	// t.Run("Nil Error returned", func(t *testing.T) {
-	// 	e := writeToFile(nilStringToTest)
-	// 	if e != nil {
-	// 		t.Error()
-	// 	}
-	// 	err := parser.LoadFromFile(fileName)
-	// 	if err != nil {
-	// 		t.Errorf("Got %v, wanted %v", err, nil)
-	// 	}
-	// })
-	// t.Run("Missing value assignment", func(t *testing.T) {
-	// 	e := writeToFile(missingValueString)
-	// 	if e != nil {
-	// 		t.Error()
-	// 	}
-	// 	err := parser.LoadFromFile(fileName)
-	// 	if err != ErrMissingValueAssignment {
-	// 		t.Errorf("Got %v, wanted %v", err, nil)
-	// 	}
-	// })
-	// t.Run("Section name missing closure parenthesis", func(t *testing.T) {
-	// 	e := writeToFile(missingClosureString)
-	// 	if e != nil {
-	// 		t.Error()
-	// 	}
-	// 	err := parser.LoadFromFile(fileName)
-	// 	if err != ErrSectionNameMissingClosure {
-	// 		t.Errorf("Got %v, wanted %v", err, nil)
-	// 	}
-	// })
-	// t.Run("Wrong Paranthesis Order", func(t *testing.T) {
-	// 	e := writeToFile(wrongParanthesisString)
-	// 	if e != nil {
-	// 		t.Error()
-	// 	}
-	// 	err := parser.LoadFromFile(fileName)
-	// 	if err != ErrWrongParanthesisOrder {
-	// 		t.Errorf("Got %v, wanted %v", err, nil)
-	// 	}
-	// })
-	// t.Run("Invalid Section starting", func(t *testing.T) {
-	// 	e := writeToFile(invaildSectionStartString)
-	// 	if e != nil {
-	// 		t.Error()
-	// 	}
-	// 	err := parser.LoadFromFile(fileName)
-	// 	if err != ErrInvalidSectionName {
-	// 		t.Errorf("Got %v, wanted %v", err, nil)
-	// 	}
-	// })
+	parser := NewParser()
+	t.Run("Nil Error returned", func(t *testing.T) {
+		e := writeToFile(nilStringToTest)
+		if e != nil {
+			t.Errorf("error is %v", e)
+		}
+		err := parser.LoadFromFile(fileName)
+		if err != nil {
+			t.Errorf("Got %v, wanted %v", err, nil)
+		}
+	})
+	t.Run("Missing value assignment", func(t *testing.T) {
+		e := writeToFile(missingValueString)
+		if e != nil {
+			t.Error()
+		}
+		err := parser.LoadFromFile(fileName)
+		if err != ErrMissingValueAssignment {
+			t.Errorf("Got %v, wanted %v", err, nil)
+		}
+	})
+	t.Run("Section name missing closure parenthesis", func(t *testing.T) {
+		e := writeToFile(missingClosureString)
+		if e != nil {
+			t.Error()
+		}
+		err := parser.LoadFromFile(fileName)
+		if err != ErrSectionNameMissingClosure {
+			t.Errorf("Got %v, wanted %v", err, nil)
+		}
+	})
+	t.Run("Wrong Paranthesis Order", func(t *testing.T) {
+		e := writeToFile(wrongParanthesisString)
+		if e != nil {
+			t.Error()
+		}
+		err := parser.LoadFromFile(fileName)
+		if err != ErrWrongParanthesisOrder {
+			t.Errorf("Got %v, wanted %v", err, nil)
+		}
+	})
+	t.Run("Invalid Section starting", func(t *testing.T) {
+		e := writeToFile(invaildSectionStartString)
+		if e != nil {
+			t.Error()
+		}
+		err := parser.LoadFromFile(fileName)
+		if err != ErrInvalidSectionName {
+			t.Errorf("Got %v, wanted %v", err, nil)
+		}
+	})
 }
 func Test_LoadFromString(t *testing.T) {
 	parser := NewParser()
