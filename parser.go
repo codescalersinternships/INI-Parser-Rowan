@@ -96,7 +96,7 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 		} else if line[0] == ']' {
 			ErrWrongParanthesisOrder = fmt.Errorf("wrong section paranthesis order, the section provided, %s, cannot start by ]", line)
 			return ErrWrongParanthesisOrder
-		} else if line[0] == ';' || line[0] == ' ' || line[0] == '\n' || line[0] == '\t' {
+		} else if line[0] == ';' || line[0] == '#' || line[0] == ' ' || line[0] == '\n' || line[0] == '\t' {
 			continue
 		} else {
 			equalFound := false
