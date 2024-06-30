@@ -155,7 +155,7 @@ func (parsedMap *Parser) Set(sectionName, key, value string) {
 
 // ToString function returns a string structure of the ini file
 // Ignores redundant spaces
-func (parsedMap *Parser) ToString() string {
+func (parsedMap *Parser) String() string {
 	var stringVersion string
 	var sortedSections []string
 	for section := range parsedMap.dictionary {
@@ -182,7 +182,7 @@ func (parsedMap *Parser) ToString() string {
 
 // SaveToFile saves the whole ini map to the given file path
 func (parsedMap *Parser) SaveToFile(fileName string) error {
-	err := os.WriteFile(fileName, []byte(parsedMap.ToString()), 0644)
+	err := os.WriteFile(fileName, []byte(parsedMap.String()), 0644)
 	if err != nil {
 		ErrCouldNotWriteToFile = fmt.Errorf("cannot write/save to file: %s", fileName)
 		return ErrCouldNotWriteToFile

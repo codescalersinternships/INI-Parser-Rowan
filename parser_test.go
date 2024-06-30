@@ -294,17 +294,17 @@ func Test_Set(t *testing.T) {
 	})
 }
 
-func Test_ToString(t *testing.T) {
+func Test_String(t *testing.T) {
 	parser := NewParser()
 	expected := "[entity]\ncodeScalers = company\n[location]\nalex = city\n[people]\nbob ross = good mentor\nrowan = just a girl"
 
-	t.Run("ToString same as input", func(t *testing.T) {
+	t.Run("String same as input", func(t *testing.T) {
 		stringToTest := "[people]\nrowan = just a girl\nbob ross = good mentor\n[entity]\ncodeScalers = company\n[location]\nalex = city"
 		err := parser.LoadFromString(stringToTest)
 		if err != nil {
 			t.Error()
 		}
-		got := parser.ToString()
+		got := parser.String()
 		if got != expected {
 			t.Errorf("Expected\n %v ,\n Got:\n %v", expected, got)
 		}
@@ -315,7 +315,7 @@ func Test_ToString(t *testing.T) {
 		if err != nil {
 			t.Error()
 		}
-		got := parser.ToString()
+		got := parser.String()
 		if got != expected {
 			t.Errorf("Expected\n%v , Got\n %v", expected, got)
 		}
