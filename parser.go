@@ -66,31 +66,37 @@ func (parsedMap *Parser) LoadFromString(str string) error {
 	iniLines := strings.Split(str, "\n")
 	return parsedMap.parserLogic(iniLines)
 }
+func (parsedMap *Parser) initializer() {
+	if parsedMap.dictionary == nil {
+		parsedMap.dictionary = make(map[string]map[string]string)
+	}
+}
 
 func (parsedMap *Parser) parserLogic(iniLines []string) error {
 	var section, key, value string
-
+	parsedMap.initializer()
 	for _, line := range iniLines {
+		line = strings.TrimSpace(line)
 		if len(line) == 0 {
 			continue
 		} else if line[0] == '[' {
 			closingParaFound := false
-			for j, ch := range line {
-				if ch == ']' {
-					section = line[1:j]
-					section = strings.Trim(section, " ")
-					closingParaFound = true
-					if parsedMap.dictionary[section] == nil {
-						parsedMap.dictionary[section] = make(map[string]string)
-					}
+			if line[len(line)-1] == ']' {
+				section = line[1 : len(line)-1]
+				section = strings.TrimSpace(section)
+				closingParaFound = true
+				if parsedMap.dictionary[section] == nil {
+					parsedMap.dictionary[section] = make(map[string]string)
 				}
 			}
+			// for j, ch := range line {
+			// 	if ch == ']' {
+
+			// 	}
+			// }
 			if !closingParaFound {
 				ErrSectionNameMissingClosure = fmt.Errorf("section [%s] is missing closure paranthesis ']'", line[1:])
 				return ErrSectionNameMissingClosure
-			}
-			if parsedMap.dictionary == nil {
-				parsedMap.dictionary = make(map[string]map[string]string)
 			}
 
 		} else if line[0] == ']' {
@@ -105,8 +111,8 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 					equalFound = true
 					key = line[0:j]
 					value = line[j+1:]
-					key = strings.Trim(key, " ")
-					value = strings.Trim(value, " ")
+					key = strings.TrimSpace(key)
+					value = strings.TrimSpace(value)
 					parsedMap.dictionary[section][key] = value
 					break
 				} else if ch == ']' {
@@ -134,7 +140,18 @@ func (parsedMap *Parser) GetSectionNames() []string {
 
 // GetSections provides the dictionary/map structure
 func (parsedMap *Parser) GetSections() map[string]map[string]string {
-	return parsedMap.dictionary
+	dummyMap := Parser{make(map[string]map[string]string)}
+	dummyMap.initializer()
+	for section := range parsedMap.dictionary {
+		if dummyMap.dictionary[section] == nil {
+			dummyMap.dictionary[section] = make(map[string]string)
+		}
+		for key, value := range parsedMap.dictionary[section] {
+			dummyMap.dictionary[section][key] = value
+		}
+
+	}
+	return dummyMap.dictionary
 }
 
 // Get function takes 2 parameters: section and its key
