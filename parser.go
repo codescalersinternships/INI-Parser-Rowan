@@ -21,7 +21,6 @@ func NewParser() Parser {
 	return Parser{make(map[string]map[string]string)}
 }
 
-
 // ErrMissingValueAssignment happens when a key isn't followed by an = statement
 var ErrMissingValueAssignment error
 
@@ -71,7 +70,7 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 		if len(line) == 0 {
 			continue
 		} else if line[0] == '[' {
-			if line[len(line)-1] ==']' {
+			if line[len(line)-1] == ']' {
 				section = line[1 : len(line)-1]
 				section = strings.TrimSpace(section)
 				if parsedMap.dictionary[section] == nil {
