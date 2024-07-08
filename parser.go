@@ -21,8 +21,6 @@ func NewParser() Parser {
 	return Parser{make(map[string]map[string]string)}
 }
 
-// ErrCouldNotOpen happens when file cannot be opened and provides file name
-var ErrCouldNotOpen error
 
 // ErrMissingValueAssignment happens when a key isn't followed by an = statement
 var ErrMissingValueAssignment error
@@ -47,8 +45,7 @@ func (parsedMap *Parser) LoadFromFile(fileName string) error {
 
 	file, err := os.Open(fileName)
 	if err != nil {
-		ErrCouldNotOpen = fmt.Errorf("cannot open file: %s", fileName)
-		return ErrCouldNotOpen
+		return fmt.Errorf("cannot open file: %s", fileName)
 	}
 	defer file.Close()
 
@@ -66,35 +63,21 @@ func (parsedMap *Parser) LoadFromString(str string) error {
 	iniLines := strings.Split(str, "\n")
 	return parsedMap.parserLogic(iniLines)
 }
-func (parsedMap *Parser) initializer() {
-	if parsedMap.dictionary == nil {
-		parsedMap.dictionary = make(map[string]map[string]string)
-	}
-}
 
 func (parsedMap *Parser) parserLogic(iniLines []string) error {
 	var section, key, value string
-	parsedMap.initializer()
 	for _, line := range iniLines {
 		line = strings.TrimSpace(line)
 		if len(line) == 0 {
 			continue
 		} else if line[0] == '[' {
-			closingParaFound := false
-			if line[len(line)-1] == ']' {
+			if line[len(line)-1] ==']' {
 				section = line[1 : len(line)-1]
 				section = strings.TrimSpace(section)
-				closingParaFound = true
 				if parsedMap.dictionary[section] == nil {
 					parsedMap.dictionary[section] = make(map[string]string)
 				}
-			}
-			// for j, ch := range line {
-			// 	if ch == ']' {
-
-			// 	}
-			// }
-			if !closingParaFound {
+			} else {
 				ErrSectionNameMissingClosure = fmt.Errorf("section [%s] is missing closure paranthesis ']'", line[1:])
 				return ErrSectionNameMissingClosure
 			}
@@ -141,7 +124,6 @@ func (parsedMap *Parser) GetSectionNames() []string {
 // GetSections provides the dictionary/map structure
 func (parsedMap *Parser) GetSections() map[string]map[string]string {
 	dummyMap := Parser{make(map[string]map[string]string)}
-	dummyMap.initializer()
 	for section := range parsedMap.dictionary {
 		if dummyMap.dictionary[section] == nil {
 			dummyMap.dictionary[section] = make(map[string]string)
