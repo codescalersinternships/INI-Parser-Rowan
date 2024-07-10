@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"sort"
 	"strings"
@@ -87,25 +88,20 @@ func (parsedMap *Parser) parserLogic(iniLines []string) error {
 		} else if line[0] == ';' || line[0] == '#' || line[0] == ' ' || line[0] == '\n' || line[0] == '\t' {
 			continue
 		} else {
-			equalFound := false
-			for j, ch := range line {
-				if ch == '=' {
-					equalFound = true
-					key = line[0:j]
-					value = line[j+1:]
-					key = strings.TrimSpace(key)
-					value = strings.TrimSpace(value)
-					parsedMap.dictionary[section][key] = value
-					break
-				} else if ch == ']' {
-					ErrInvalidSectionName = fmt.Errorf("section name provided, %s, can't start with anything other than '['", line[:j+1])
-					return ErrInvalidSectionName
-				}
+			if line[len(line)-1] == ']' {
+				ErrInvalidSectionName = fmt.Errorf("section name provided, %s, can't start with anything other than '['", line)
+				return ErrInvalidSectionName
 			}
-			if !equalFound {
+			keyValue := strings.Split(line, "=")
+			if len(keyValue) == 1 {
 				ErrMissingValueAssignment = fmt.Errorf("key provided, %s , is not assigned to a value, no '=' found", line)
 				return ErrMissingValueAssignment
 			}
+			key = keyValue[0]
+			value = keyValue[1]
+			key = strings.TrimSpace(key)
+			value = strings.TrimSpace(value)
+			parsedMap.dictionary[section][key] = value
 		}
 	}
 	return nil
@@ -123,15 +119,7 @@ func (parsedMap *Parser) GetSectionNames() []string {
 // GetSections provides the dictionary/map structure
 func (parsedMap *Parser) GetSections() map[string]map[string]string {
 	dummyMap := Parser{make(map[string]map[string]string)}
-	for section := range parsedMap.dictionary {
-		if dummyMap.dictionary[section] == nil {
-			dummyMap.dictionary[section] = make(map[string]string)
-		}
-		for key, value := range parsedMap.dictionary[section] {
-			dummyMap.dictionary[section][key] = value
-		}
-
-	}
+	maps.Copy(dummyMap.dictionary, parsedMap.dictionary)
 	return dummyMap.dictionary
 }
 
